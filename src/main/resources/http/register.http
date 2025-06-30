@@ -1,0 +1,11 @@
+### Register
+POST http://localhost:9999/auth/register
+Content-Type: application/json
+
+{
+  "username": "gofurovmuhammadsolih004@gmail.com",
+  "name": "Salome",
+  "password": "secret"
+}
+
+###
