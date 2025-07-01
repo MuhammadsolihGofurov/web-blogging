@@ -26,6 +26,12 @@ public class AuthService {
     @Autowired
     private ProfileRoleService profileRoleService;
 
+    @Autowired
+    private EmailSendingService emailSendingService;
+
+    @Autowired
+    private ProfileEntityService profileEntityService;
+
     public String registration(registerDTO registerDto) {
         // check if profile is exist
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(registerDto.getUsername());
@@ -61,6 +67,7 @@ public class AuthService {
         // save entity with in_registration status
 
         // send email code
+        emailSendingService.sendRegistrationEmail(registerDto.getUsername(), profileEntity.getId());
 
         // if entity saved with in_registration, resend email code
 
@@ -69,4 +76,12 @@ public class AuthService {
         return "success";
     }
 
+    public String regVerification(Integer id) {
+        ProfileEntity profile = profileEntityService.getById(id);
+
+        //  status check
+
+
+        return "verified";
+    }
 }

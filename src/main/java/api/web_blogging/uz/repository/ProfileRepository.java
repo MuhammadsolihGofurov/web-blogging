@@ -11,5 +11,6 @@ import java.util.Optional;
 public interface ProfileRepository extends JpaRepository<ProfileEntity, Integer> {
 
     Optional<ProfileEntity> findByUsernameAndVisibleTrue(String username);
+    Optional<ProfileEntity> findByIdAndVisibleTrue(Integer id);
 
 }
