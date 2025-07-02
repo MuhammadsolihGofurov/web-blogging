@@ -1,5 +1,7 @@
 package api.web_blogging.uz.services;
 
+import api.web_blogging.uz.dto.LoginDto;
+import api.web_blogging.uz.dto.ProfileDto;
 import api.web_blogging.uz.dto.registerDTO;
 import api.web_blogging.uz.entity.ProfileEntity;
 import api.web_blogging.uz.entity.ProfileRoleEntity;
@@ -7,7 +9,11 @@ import api.web_blogging.uz.enums.GeneralStatus;
 import api.web_blogging.uz.enums.ProfileRole;
 import api.web_blogging.uz.exps.AppBadException;
 import api.web_blogging.uz.repository.ProfileRepository;
+import api.web_blogging.uz.repository.ProfileRoleRepository;
+import api.web_blogging.uz.utils.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +37,10 @@ public class AuthService {
 
     @Autowired
     private ProfileEntityService profileEntityService;
+
+    @Autowired
+    private ProfileRoleRepository profileRoleRepository;
+
 
     public String registration(registerDTO registerDto) {
         // check if profile is exist
@@ -69,19 +79,51 @@ public class AuthService {
         // send email code
         emailSendingService.sendRegistrationEmail(registerDto.getUsername(), profileEntity.getId());
 
-        // if entity saved with in_registration, resend email code
-
-        //
-
         return "success";
     }
 
-    public String regVerification(Integer id) {
-        ProfileEntity profile = profileEntityService.getById(id);
+    public String regVerification(String token) {
+        try {
+            Integer profileId = JwtUtil.decodeEmail(token);
+            ProfileEntity profile = profileEntityService.getById(profileId);
 
-        //  status check
+            //  status check
+            if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+                profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
+                return "Verification successfully activated";
+            }
+        } catch (JwtException e) {
+            throw new AppBadException("Invalid token");
+        }
 
-
-        return "verified";
+        throw new AppBadException("Verification failed");
     }
+
+    public ProfileDto login(LoginDto loginDto) {
+        Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(loginDto.getUsername());
+        ProfileEntity profile = optional.get();
+
+        if (optional.isEmpty()) {
+            throw new AppBadException("Username or password is wrong");
+        }
+        if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), profile.getPassword())) {
+            throw new AppBadException("Username or password is wrong");
+        }
+        if (!profile.getStatus().equals(GeneralStatus.ACTIVE)) {
+            throw new AppBadException("Wrong status");
+        }
+
+        //  response
+
+        ProfileDto newDto = new ProfileDto();
+        newDto.setUsername(profile.getUsername());
+        newDto.setName(profile.getName());
+        newDto.setRoles(profileRoleRepository.getAllRolesListByProfileId(profile.getId()));
+        //  jwt
+        newDto.setToken(JwtUtil.encode(profile.getId(), newDto.getRoles()));
+
+
+        return newDto;
+    }
+
 }

@@ -8,4 +8,11 @@ Content-Type: application/json
   "password": "secret"
 }
 
-###
+### Login
+POST http://localhost:9999/auth/login
+Content-Type: application/json
+
+{
+  "username": "gofurovmuhammadsolih004@gmail.com",
+  "password": "secret"
+}

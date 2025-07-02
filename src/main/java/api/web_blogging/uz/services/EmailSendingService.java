@@ -1,6 +1,7 @@
 package api.web_blogging.uz.services;
 
 
+import api.web_blogging.uz.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +14,9 @@ public class EmailSendingService {
     @Value("${spring.mail.username}")
     private String fromAccount;
 
+    @Value("${server.domain}")
+    private String serverDomain;
+
 
     @Autowired
     private JavaMailSender mailSender;
@@ -20,8 +24,8 @@ public class EmailSendingService {
 
     public void sendRegistrationEmail(String email, Integer profileId) {
         String subject = "Complete Registration";
-        String link = "http://localhost:9999/auth/confirmation";
-        String body = "Welcome, to our website. Please click the link for complete your registration " + profileId + "!";
+        String link = serverDomain + "/auth/register/verification/" + JwtUtil.encodeEmail(profileId);
+        String body = "Welcome, to our website. Please click the link for complete your registration" + " " + link + " !";
         sendEmail(email, subject, body);
     }
 
