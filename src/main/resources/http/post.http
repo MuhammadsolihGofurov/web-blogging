@@ -1,0 +1,8 @@
+### Register
+POST http://localhost:9999/post/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnb2Z1cm92bXVoYW1tYWRzb2xpaDAwNEBnbWFpbC5jb20iLCJyb2xlcyI6IlJPTEVfVVNFUiIsImlkIjoiMTQiLCJpYXQiOjE3NTE5NjgwMjEsImV4cCI6MTc1MjA1NDQyMX0.pyCaivPZu-gxUZCZdbyHKOPMGPU62wYmKBWYpeqQFmo
+
+{
+  "title": "Post title new"
+}

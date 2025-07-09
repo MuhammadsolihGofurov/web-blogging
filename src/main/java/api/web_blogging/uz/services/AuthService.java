@@ -5,6 +5,7 @@ import api.web_blogging.uz.dto.ProfileDto;
 import api.web_blogging.uz.dto.registerDTO;
 import api.web_blogging.uz.entity.ProfileEntity;
 import api.web_blogging.uz.entity.ProfileRoleEntity;
+import api.web_blogging.uz.enums.AppLang;
 import api.web_blogging.uz.enums.GeneralStatus;
 import api.web_blogging.uz.enums.ProfileRole;
 import api.web_blogging.uz.exps.AppBadException;
@@ -14,10 +15,12 @@ import api.web_blogging.uz.utils.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -41,8 +44,13 @@ public class AuthService {
     @Autowired
     private ProfileRoleRepository profileRoleRepository;
 
+    @Autowired
+    private ResourceBundleService getMessageService;
 
-    public String registration(registerDTO registerDto) {
+    @Autowired
+    private SmsSendService smsSendService;
+
+    public String registration(registerDTO registerDto, AppLang lang) {
         // check if profile is exist
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(registerDto.getUsername());
         if (optional.isPresent()) {
@@ -55,7 +63,7 @@ public class AuthService {
 
                 //  send resend sms
             } else {
-                throw new AppBadException("User already exists");
+                throw new AppBadException(getMessageService.getMessage("email.phone.exists" , lang));
             }
         }
 
@@ -77,9 +85,10 @@ public class AuthService {
         // save entity with in_registration status
 
         // send email code
+//        smsSendService.sendRegistrationMessage(profileEntity.getUsername());
         emailSendingService.sendRegistrationEmail(registerDto.getUsername(), profileEntity.getId());
 
-        return "success";
+        return getMessageService.getMessage("register.success" , lang);
     }
 
     public String regVerification(String token) {
@@ -99,18 +108,18 @@ public class AuthService {
         throw new AppBadException("Verification failed");
     }
 
-    public ProfileDto login(LoginDto loginDto) {
+    public ProfileDto login(LoginDto loginDto, AppLang lang) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(loginDto.getUsername());
         ProfileEntity profile = optional.get();
 
         if (optional.isEmpty()) {
-            throw new AppBadException("Username or password is wrong");
+            throw new AppBadException(getMessageService.getMessage("username.passwrod.wrong" , lang));
         }
         if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), profile.getPassword())) {
-            throw new AppBadException("Username or password is wrong");
+            throw new AppBadException(getMessageService.getMessage("username.passwrod.wrong" , lang));
         }
         if (!profile.getStatus().equals(GeneralStatus.ACTIVE)) {
-            throw new AppBadException("Wrong status");
+            throw new AppBadException(getMessageService.getMessage("status.wrong" , lang));
         }
 
         //  response
@@ -120,7 +129,7 @@ public class AuthService {
         newDto.setName(profile.getName());
         newDto.setRoles(profileRoleRepository.getAllRolesListByProfileId(profile.getId()));
         //  jwt
-        newDto.setToken(JwtUtil.encode(profile.getId(), newDto.getRoles()));
+        newDto.setToken(JwtUtil.encode(profile.getUsername(), profile.getId(), newDto.getRoles()));
 
 
         return newDto;

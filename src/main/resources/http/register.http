@@ -1,6 +1,7 @@
 ### Register
 POST http://localhost:9999/auth/register
 Content-Type: application/json
+Accept-Language: en
 
 {
   "username": "gofurovmuhammadsolih004@gmail.com",

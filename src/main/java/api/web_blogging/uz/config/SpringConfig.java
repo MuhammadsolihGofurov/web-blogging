@@ -1,6 +1,7 @@
 package api.web_blogging.uz.config;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,11 +14,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.UUID;
 
 @Configuration
 public class SpringConfig {
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public static final String[] AUTH_WHITELIST = {
+            "/auth/**",
+    };
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -26,20 +38,10 @@ public class SpringConfig {
 
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        // authentication - Foydalanuvchining identifikatsiya qilish.
-        // Ya'ni berilgan login va parolli user bor yoki yo'qligini aniqlash.
-        String password = UUID.randomUUID().toString();
-        System.out.println("User Password Mazgi: " + password);
-
-        UserDetails user = User.builder()
-                .username("user")
-                .password("{noop}" + password)
-                .roles("USER")
-                .build();
-
+    public AuthenticationProvider authenticationProvider(BCryptPasswordEncoder bCryptPasswordEncoder) {
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(new InMemoryUserDetailsManager(user));
+        authenticationProvider.setUserDetailsService(customUserDetailsService);
+        authenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
         return authenticationProvider;
     }
 
@@ -49,10 +51,10 @@ public class SpringConfig {
         // Ya'ni foydalanuvchi murojat qilayotgan API-larni ishlatishga ruxsati bor yoki yo'qligini tekshirishdir.
         http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
             authorizationManagerRequestMatcherRegistry
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers(AUTH_WHITELIST).permitAll()
                     .anyRequest()
                     .authenticated();
-        }).formLogin(Customizer.withDefaults());
+        }).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable); // csrf yoqilgan
         http.cors(Customizer.withDefaults()); // cors yoqilgan

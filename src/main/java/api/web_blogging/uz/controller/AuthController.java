@@ -4,6 +4,7 @@ package api.web_blogging.uz.controller;
 import api.web_blogging.uz.dto.LoginDto;
 import api.web_blogging.uz.dto.ProfileDto;
 import api.web_blogging.uz.dto.registerDTO;
+import api.web_blogging.uz.enums.AppLang;
 import api.web_blogging.uz.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,9 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody registerDTO registerDto) {
-        return ResponseEntity.ok().body(authService.registration(registerDto));
+    public ResponseEntity<String> registerUser(@Valid @RequestBody registerDTO registerDto,
+                                               @RequestHeader(value = "Accept-Language", defaultValue = "uz") AppLang lang) {
+        return ResponseEntity.ok().body(authService.registration(registerDto, lang));
     }
 
     @GetMapping("/register/verification/{token}")
@@ -28,8 +30,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ProfileDto> loginUser(@Valid @RequestBody LoginDto loginDto) {
-        return ResponseEntity.ok().body(authService.login(loginDto));
+    public ResponseEntity<ProfileDto> loginUser(@Valid @RequestBody LoginDto loginDto,
+                                                @RequestHeader(value = "Accept-Language", defaultValue = "uz") AppLang lang) {
+        return ResponseEntity.ok().body(authService.login(loginDto, lang));
     }
 
 }

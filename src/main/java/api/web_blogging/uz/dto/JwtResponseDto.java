@@ -10,5 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class JwtResponseDto {
     private Integer id;
+    private String username;
     private List<ProfileRole> roles;
 }

@@ -1,0 +1,24 @@
+POST https://notify.eskiz.uz/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "gofurovmuhammadsolih004@gmail.com",
+  "password": "lltX3mXkDG5f3iKHYglq4yuBsDPCQvIIREh0fJjn"
+}
+
+
+###
+
+#TOKEN eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTQ2MzMzNDgsImlhdCI6MTc1MjA0MTM0OCwicm9sZSI6InRlc3QiLCJzaWduIjoiNGE0NjdlODhjY2M5MzMwOTIxMjI2OGQ4MmNjNTMwNDcxNDViYWRhOWE5MDczNjBmYTljOWI5YTEwYjNhNTMwZiIsInN1YiI6IjExNjQ4In0.dSF4mhgImwVwl8bqaH7fxttvKKP4eq1aYzO-vwbw_5c
+
+
+### Eskiz sms send
+POST https://notify.eskiz.uz/api/message/sms/send
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTQ2MzMzNDgsImlhdCI6MTc1MjA0MTM0OCwicm9sZSI6InRlc3QiLCJzaWduIjoiNGE0NjdlODhjY2M5MzMwOTIxMjI2OGQ4MmNjNTMwNDcxNDViYWRhOWE5MDczNjBmYTljOWI5YTEwYjNhNTMwZiIsInN1YiI6IjExNjQ4In0.dSF4mhgImwVwl8bqaH7fxttvKKP4eq1aYzO-vwbw_5c
+
+{
+  "mobile_phone": "998947551444",
+  "message": "<#> Bu Eskiz dan test. ",
+  "from": "4546"
+}
