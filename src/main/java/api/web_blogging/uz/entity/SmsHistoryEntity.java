@@ -31,4 +31,7 @@ public class SmsHistoryEntity {
 
     @Enumerated(EnumType.STRING)
     private SmsType smsType;
+
+    @Column(name = "attempt_count")
+    private Integer attemptCount = 0;
 }

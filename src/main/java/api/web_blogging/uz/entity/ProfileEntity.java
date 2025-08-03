@@ -30,10 +30,19 @@ public class ProfileEntity {
     @Enumerated(EnumType.STRING)
     private GeneralStatus status;
 
+    @Column(name = "temp_username")
+    private String tempUsername;
+
 
     @Column(name = "visible")
     private Boolean visible = Boolean.TRUE;
 
+    @Column(name = "photo_id")
+    private String photoId;
+
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "photo_id", insertable = false, updatable = false)
+    private AttachEntity photo;
 
     // roles //
 

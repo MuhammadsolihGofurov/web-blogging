@@ -52,6 +52,16 @@ public class SmsSendService {
         sendSmsWithSaveDb(phoneNumber, message, code, SmsType.REGISTRATION);
     }
 
+    public void sendUsernmaeChangeConfirmSms(String phoneNumber) {
+        String code = RandomUtil.getRandomSmsCode();
+        String message = "Username o'zgartirish uchun parol: %s";
+        message = String.format(message, code);
+//        bu yerda yangi smsType qo'shilgani uchun error chiqadi.sqldan constraintni o'chirib yuborish kerak.
+//        alter table sms_history
+//        drop constraint sms_history_sms_type_check
+        sendSmsWithSaveDb(phoneNumber, message, code, SmsType.USERNAME_CHANGE_CODE);
+    }
+
     public SmsAuthResponseDto sendSmsWithSaveDb(String phoneNumber, String message, String code, SmsType smsType) {
         //  check
         Long count = smsSendHistoryService.getSmsCount(phoneNumber);
@@ -117,7 +127,6 @@ public class SmsSendService {
         return "string";
     }
 
-
     private String getTokenFromProvider() {
         SmsAuthDto authDto = new SmsAuthDto();
         authDto.setEmail(loginUsername);
@@ -130,6 +139,13 @@ public class SmsSendService {
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void sendResetMessage(String username) {
+        String code = RandomUtil.getRandomSmsCode();
+        String message = "Reset password uchun code yuborildi: %s";
+        message = String.format(message, code);
+        sendSmsWithSaveDb(username, message, code, SmsType.RESET_PASSWORD);
     }
 
 }

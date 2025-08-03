@@ -1,0 +1,8 @@
+### Upload Attach
+POST http://localhost:9999/attach/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file'; filename="111.jpg"
+
+< C:\Users\pathnameforpicture.png
