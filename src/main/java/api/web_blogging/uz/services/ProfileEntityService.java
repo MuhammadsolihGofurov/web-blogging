@@ -155,7 +155,7 @@ public class ProfileEntityService {
         Page<ProfileEntity> filterResult = null;
 
         if (dto.getQuery() == null) {
-            filterResult = profileRepository.findAllByOrderByCreatedAtDesc(pageable);
+            filterResult = profileRepository.findAllByVisibleIsTrueOrderByCreatedAtDesc(pageable);
         } else {
             filterResult = profileRepository.filterWithQuery("%" + dto.getQuery().toLowerCase() + "%", pageable);
         }
