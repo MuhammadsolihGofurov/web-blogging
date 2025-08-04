@@ -5,6 +5,7 @@ import api.web_blogging.uz.dto.ProfileDto;
 import api.web_blogging.uz.dto.profile.*;
 import api.web_blogging.uz.dto.sms.CodeDTO;
 import api.web_blogging.uz.entity.ProfileEntity;
+import api.web_blogging.uz.entity.ProfileRoleEntity;
 import api.web_blogging.uz.enums.AppLang;
 import api.web_blogging.uz.enums.ProfileRole;
 import api.web_blogging.uz.exps.AppBadException;
@@ -165,14 +166,34 @@ public class ProfileEntityService {
         return new PageImpl<>(resultsList, pageable, filterResult.getTotalElements());
     }
 
-
     public ProfileDto toDTO(ProfileEntity profile) {
         ProfileDto dto = new ProfileDto();
         dto.setName(profile.getName());
         dto.setUsername(profile.getUsername());
+        if (profile.getRoleList() != null) {
+            List<ProfileRole> roleList = profile.getRoleList().stream().map(ProfileRoleEntity::getRoles)
+                    .toList();
+            dto.setRoles(roleList);
+        }
         dto.setStatus(profile.getStatus());
         dto.setPhotoUrl(attachService.openURL(profile.getPhotoId()));
         return dto;
     }
 
+    public AppResponse<String> changeStatusProfile(Integer id, ChangeProfileStatusDTO dto) {
+        profileRepository.updateProfileStatus(id, dto.getStatus());
+        return new AppResponse<>("Successfully changed");
+    }
+
+    public AppResponse<String> deleteProfile(Integer id) {
+        ProfileEntity profile = getById(id);
+        if (profile == null) {
+            throw new AppBadException("Profile not found");
+        }
+
+        profileRepository.updateVisibleIsFalse(id);
+
+        return new AppResponse<>("Successfully deleted");
+
+    }
 }

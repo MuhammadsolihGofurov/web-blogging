@@ -50,16 +50,29 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, Integer>
     @Query("update ProfileEntity  set username =?2 where id =?1")
     void updateUsername(Integer userId, String tempUsername);
 
+    @Modifying
+    @Transactional
+    @Query("update ProfileEntity  set status =?2 where id =?1")
+    void updateProfileStatus(Integer userId, GeneralStatus status);
+
 
     @Modifying
     @Transactional
     @Query("update ProfileEntity  set photoId =?2 where id =?1")
     void updatePhoto(Integer userId, String photoId);
 
+
+    @Query("From ProfileEntity as p inner join fetch p.roleList where  p.visible = true order by p.createdAt desc")
     Page<ProfileEntity> findAllByVisibleIsTrueOrderByCreatedAtDesc(PageRequest pageRequest);
 
-    @Query("From ProfileEntity where (lower(username) like ?1 or lower(name) like ?1) and visible = true")
+    @Query("From ProfileEntity as p inner join fetch p.roleList where (lower(p.username) like ?1 or lower(p.name) like ?1) and p.visible = true")
     Page<ProfileEntity> filterWithQuery(String query, PageRequest pageRequest);
+
+    @Query("update ProfileEntity set visible = false where id =?1")
+    void updateVisibleIsFalse(Integer id);
+
+//    @Query("select p, (select count (post) from PostEntity as post where post.profileId = p.id)") as PostCount
+//    Page<ProfileEntity> filterWithPostCount(PageRequest pageRequest);
 
 //    @Modifying
 //    @Transactional

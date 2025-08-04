@@ -79,4 +79,20 @@ public class ProfileController {
         return ResponseEntity.ok().body(response);
     }
 
+    @PutMapping("/status/{id}")
+    @Operation(summary = "change profile status", description = "Api for changes status")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<AppResponse<String>> changeStatus(@PathVariable("id") Integer id, @RequestBody ChangeProfileStatusDTO dto) {
+        AppResponse<String> response = profileEntityService.changeStatusProfile(id, dto);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "change profile status", description = "Api for update visible and delete profile")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<AppResponse<String>> deleteProfile(@PathVariable("id") Integer id) {
+        AppResponse<String> response = profileEntityService.deleteProfile(id);
+        return ResponseEntity.ok().body(response);
+    }
+
 }
